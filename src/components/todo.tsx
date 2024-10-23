@@ -56,11 +56,6 @@ const Todo: FC<TodoProps> = ({ todo, onClick }) => {
           <p>{date(todo.date)}</p>
         </div>
         <Divider />
-        <div className='flex justify-between items-center'>
-          <p className='font-semibold text-gray-700'>Created At</p>
-          <p>{date(todo.createdAt)}</p>
-        </div>
-        <Divider />
       </Drawer>
     </>
   );
