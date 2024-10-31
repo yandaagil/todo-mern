@@ -1,4 +1,5 @@
 import client from "@/lib/mongodb/db";
+import { signJWT } from "@/utils/jwt";
 import { MongoDBAdapter } from "@auth/mongodb-adapter";
 import NextAuth, { NextAuthOptions } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
@@ -15,6 +16,7 @@ export const authOptions: NextAuthOptions = {
           id: profile.sub,
           name: profile.name,
           email: profile.email,
+          image: profile.picture,
         };
       },
     }),
@@ -31,6 +33,19 @@ export const authOptions: NextAuthOptions = {
   callbacks: {
     async redirect({ baseUrl }) {
       return baseUrl;
+    },
+    async jwt({ token, user }) {
+      if (user) {
+        token.id = user.id;
+      }
+      return token;
+    },
+    async session({ session, token }) {
+      session.user.id = token.id;
+      const accessToken = signJWT(token);
+
+      session.accessToken = accessToken;
+      return session;
     },
   },
 };

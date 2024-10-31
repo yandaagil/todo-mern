@@ -1,64 +1,85 @@
-import { TodoData } from '@/types/todo.type';
-import { date } from '@/utils/dateFormat';
-import { Card, Divider, Drawer } from 'antd';
-import { Calendar, Check } from 'lucide-react';
-import React, { FC, useState } from 'react'
-import EditModal from './editModal';
-import DeleteModal from './deleteModal';
+import { FC } from 'react'
+import { TodoData } from '@/types/todo.type'
+import { useTodo } from '@/hooks/useTodo'
+import { Card, message } from 'antd'
+import { Calendar, Check } from 'lucide-react'
+import { date } from '@/utils/date'
+import TodoAction from './todoAction'
+import { useSelect } from '@/stores/select.store'
+import { cn } from '@/lib/utils'
+import { dueDate } from '@/helpers/todoDate'
 
 type TodoProps = {
-  todo: TodoData
-  onClick: () => void
+  todo: TodoData[]
 }
 
-const Todo: FC<TodoProps> = ({ todo, onClick }) => {
-  const [open, setOpen] = useState(false);
+const Todo: FC<TodoProps> = ({ todo }) => {
+  const { updateMutation: { mutateAsync } } = useTodo()
+  const { selectMode, handleSelectTodo, selectedTodos } = useSelect();
+
+  const handleUpdate = async (id: string, isCompleted: boolean) => {
+    try {
+      await mutateAsync({
+        id,
+        data: { isCompleted },
+      });
+      message.success('Task updated successfully');
+    } catch (error) {
+      console.log(error);
+      message.error('Failed to update task');
+    }
+  };
 
   return (
-    <>
-      <Card size='small' className='group' onClick={() => setOpen(true)} hoverable>
-        <div className='flex flex-row justify-between'>
-          <div className="flex gap-3">
-            <button
-              className={`h-6 w-6 border-2 text-white rounded-md inline-flex gap-2 items-center justify-center font-medium 
-                ${todo.isCompleted ? 'border-violet-700 bg-violet-700' : 'border-gray-200 transition-colors hover:text-gray-500'}`}
-              onClick={onClick}
-            >
-              <Check size={14} />
-            </button>
-            <div className="flex flex-col gap-2">
-              <p className="font-semibold">{todo.todo}</p>
-              <p className="text-xs text-gray-600 font-semibold flex gap-2 items-center">
-                <Calendar size={15} />
-                {date(todo.date)}
-              </p>
+    <div className='space-y-3'>
+      {todo.length > 0 ? (
+        todo.map((todo: TodoData) => (
+          <Card key={todo.todo_id} size='small' className='group'>
+            <div className='flex flex-row justify-between'>
+              <div className="flex gap-3">
+                <button
+                  className={cn("h-6 w-6 border-2 rounded-md inline-flex items-center justify-center text-white transition-colors",
+                    {
+                      "border-violet-700 bg-violet-700":
+                        selectMode ? selectedTodos.includes(todo.todo_id) : todo.isCompleted,
+                      "border-gray-200 hover:border-gray-300 hover:text-gray-500":
+                        !(selectMode ? selectedTodos.includes(todo.todo_id) : todo.isCompleted)
+                    }
+                  )}
+                  onClick={
+                    selectMode
+                      ? () => handleSelectTodo(todo.todo_id)
+                      : () => handleUpdate(todo.todo_id, !todo.isCompleted)
+                  }
+                >
+                  <Check size={14} />
+                </button>
+                <div className="flex flex-col gap-2">
+                  <p className={cn(
+                    "font-semibold",
+                    { "line-through text-gray-500": todo.isCompleted }
+                  )}>{todo.todo}</p>
+                  <p className={cn('text-xs font-semibold flex gap-2 items-center text-gray-600',
+                    {
+                      'text-yellow-600': !todo.isCompleted && dueDate(todo.date) === 0,
+                      'text-red-600': !todo.isCompleted && (dueDate(todo.date) === -1 || dueDate(todo.date) < -1)
+                    }
+                  )}>
+                    <Calendar size={15} />
+                    {date(todo.date)}
+                  </p>
+                </div>
+              </div>
+              {!selectMode && <TodoAction todo={todo} />}
             </div>
-          </div>
-          <div className="flex items-center gap-2">
-            <EditModal todo={todo} />
-            <DeleteModal todo={todo} />
-          </div>
+          </Card>
+        ))) : (
+        <div className="flex items-center justify-center">
+          <p className="text-gray-500">No todos yet</p>
         </div>
-      </Card>
-      <Drawer title="Detail" onClose={() => setOpen(false)} open={open}>
-        <div className='flex justify-between items-center'>
-          <p className='font-semibold text-gray-700'>Todo</p>
-          <p>{todo.todo}</p>
-        </div>
-        <Divider />
-        <div className='flex justify-between items-center'>
-          <p className='font-semibold text-gray-700'>Status</p>
-          <p>{todo.isCompleted ? 'Completed' : 'Uncompleted'}</p>
-        </div>
-        <Divider />
-        <div className='flex justify-between items-center'>
-          <p className='font-semibold text-gray-700'>Date</p>
-          <p>{date(todo.date)}</p>
-        </div>
-        <Divider />
-      </Drawer>
-    </>
-  );
+      )}
+    </div>
+  )
 }
 
 export default Todo

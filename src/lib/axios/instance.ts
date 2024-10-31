@@ -1,4 +1,5 @@
 import axios from "axios";
+import { getSession } from "next-auth/react";
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASEURL;
 
@@ -13,10 +14,11 @@ const instance = axios.create({
   headers,
 });
 
-instance.interceptors.response.use(
-  (config) => config,
-  (error) => Promise.reject(error)
-);
+instance.interceptors.request.use(async (config) => {
+  const session = await getSession();
+  if (session) config.headers.Authorization = `Bearer ${session.accessToken}`;
+  return config;
+});
 
 instance.interceptors.request.use(
   (response) => response,

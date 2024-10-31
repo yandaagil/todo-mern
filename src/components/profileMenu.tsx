@@ -6,10 +6,14 @@ import React from 'react'
 const items: MenuProps['items'] = [
   {
     key: '1',
-    label: <p onClick={() => signOut()}>Log Out</p>,
+    label: "Log Out",
     danger: true,
   },
 ];
+
+const onClick: MenuProps['onClick'] = () => {
+  signOut()
+};
 
 const ProfileMenu = () => {
   const { data: session } = useSession()
@@ -17,7 +21,7 @@ const ProfileMenu = () => {
   return (
     <>
       {session &&
-        <Dropdown menu={{ items }} trigger={['click']} placement="bottom" arrow>
+        <Dropdown menu={{ items, onClick }} trigger={['click']} placement="bottom" arrow>
           <Button icon={<ChevronDown size={16} />} iconPosition="end">{session?.user?.name}</Button>
         </Dropdown>
       }

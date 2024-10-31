@@ -1,5 +1,5 @@
 import React, { FC, useEffect, useState } from 'react';
-import { Button, DatePicker, Input, Modal, message } from 'antd';
+import { Button, DatePicker, Input, Modal, Tooltip, message } from 'antd';
 import { Edit } from 'lucide-react';
 import { TodoData } from '@/types/todo.type';
 import dayjs, { Dayjs } from 'dayjs';
@@ -20,7 +20,7 @@ const EditModal: FC<EditModalProps> = ({ todo }) => {
     task: '',
     date: null,
   });
-  const { editMutation: { mutate, isPending, isSuccess } } = useTodo();
+  const { updateMutation: { mutateAsync, isPending } } = useTodo();
 
   const resetForm = () => {
     setForm({ task: '', date: null });
@@ -40,20 +40,27 @@ const EditModal: FC<EditModalProps> = ({ todo }) => {
     }));
   };
 
-  const handleUpdate = () => {
+  const handleUpdate = async () => {
     if (!todo?.todo_id || !form.task || !form.date) {
       message.warning('Please fill in all required fields');
       return;
     }
 
-    mutate({
-      id: todo.todo_id,
-      data: { todo: form.task, date: form.date, isCompleted: todo.isCompleted },
-    });
-
-    if (isSuccess) {
+    try {
+      mutateAsync({
+        id: todo.todo_id,
+        data: {
+          todo: form.task,
+          date: form.date,
+          isCompleted: todo.isCompleted
+        },
+      });
+      message.success('Task updated successfully');
       setIsOpen(false);
       resetForm();
+    } catch (error) {
+      console.log(error);
+      message.error('Failed to update task');
     }
   };
 
@@ -68,12 +75,14 @@ const EditModal: FC<EditModalProps> = ({ todo }) => {
 
   return (
     <>
-      <Button
-        shape="circle"
-        className='hidden group-hover:block'
-        icon={<Edit size={16} />}
-        onClick={() => setIsOpen(true)}
-      />
+      <Tooltip title='Edit'>
+        <Button
+          type='text'
+          shape='circle'
+          icon={<Edit size={16} />}
+          onClick={() => setIsOpen(true)}
+        />
+      </Tooltip>
 
       <Modal
         title="Edit Todo"

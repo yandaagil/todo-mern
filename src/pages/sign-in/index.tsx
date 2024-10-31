@@ -4,8 +4,8 @@ import { signIn } from 'next-auth/react';
 import { GoogleOutlined } from '@ant-design/icons';
 
 const SignIn: FC = () => (
-  <div className="container mx-auto space-y-5 md:max-w-2xl">
-    <header className="mt-16 flex justify-between items-center">
+  <div className="container mx-auto py-5 px-5 md:py-16 space-y-5 md:max-w-2xl">
+    <header className="flex justify-between items-center">
       <h2 className="text-2xl font-bold">To-Do</h2>
     </header>
     <Divider />

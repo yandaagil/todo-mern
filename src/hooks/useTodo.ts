@@ -1,42 +1,45 @@
-import todoServices from "@/services/service";
-import { UpdateTodo } from "@/types/todo.type";
+import todoServices from "@/services/todo.service";
+import { TodoData, UpdateTodo } from "@/types/todo.type";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { message } from "antd";
 
-export const useTodo = () => {
+export const useTodo = (search: string = "") => {
   const queryClient = useQueryClient();
 
   const query = useQuery({
-    queryKey: ["todos"],
-    queryFn: todoServices.getTodos,
+    queryKey: ["todos", { search: search }],
+    queryFn: () => todoServices.fetchTodos(search),
+    refetchOnWindowFocus: false,
+    staleTime: 1000 * 60 * 5, // 5 minutes
+    select: (data) => {
+      const todos: TodoData[] = data?.data.data || [];
+      const uncompletedTodo = todos.filter((todo) => !todo.isCompleted);
+      const completedTodo = todos.filter((todo) => todo.isCompleted);
+
+      return { todos, uncompletedTodo, completedTodo };
+    },
   });
 
-  const handleSuccess = (msg: string) => {
-    queryClient.invalidateQueries({ queryKey: ["todos"] });
-    message.success(msg);
-  };
+  const createMutation = useMutation({
+    mutationFn: todoServices.addTodo,
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["todos"] }),
+  });
 
-  const handleError = (msg: string) => (error: unknown) => {
-    console.error(msg, error);
-    message.error(msg);
-  };
-
-  const editMutation = useMutation({
+  const updateMutation = useMutation({
     mutationFn: ({ id, data }: { id: string; data: UpdateTodo }) =>
       todoServices.updateTodo(id, data),
-    onSuccess: () => handleSuccess("Task updated successfully!"),
-    onError: handleError("Failed to update task"),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["todos"] }),
   });
 
   const deleteMutation = useMutation({
-    mutationFn: (id: string) => todoServices.deleteTodo(id),
-    onSuccess: () => handleSuccess("Task deleted successfully!"),
-    onError: handleError("Failed to delete task"),
+    mutationFn: ({ id, ids }: { id?: string; ids?: string[] }) =>
+      todoServices.deleteTodo(id, ids),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["todos"] }),
   });
 
   return {
     query,
-    editMutation,
+    createMutation,
+    updateMutation,
     deleteMutation,
   };
 };

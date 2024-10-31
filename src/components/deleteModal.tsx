@@ -1,8 +1,8 @@
 import React, { FC, useState } from 'react';
-import { Button, Card, Modal } from 'antd';
+import { Button, Card, Modal, Tooltip, message } from 'antd';
 import { Calendar, Trash } from 'lucide-react';
 import { TodoData } from '@/types/todo.type';
-import { date } from '@/utils/dateFormat';
+import { date } from '@/utils/date';
 import { useTodo } from '@/hooks/useTodo';
 
 interface DeleteModalProps {
@@ -11,26 +11,34 @@ interface DeleteModalProps {
 
 const DeleteModal: FC<DeleteModalProps> = ({ todo }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const { deleteMutation: { mutate, isPending, isSuccess } } = useTodo();
+  const { deleteMutation: { mutateAsync, isPending } } = useTodo();
 
-  const handleDelete = () => {
-    if (todo?.todo_id) {
-      mutate(todo.todo_id);
-      if (isSuccess) setIsOpen(false);
+  const handleDelete = async () => {
+    if (!todo?.todo_id) {
+      message.warning('Task does not exist');
+      return
+    }
+
+    try {
+      await mutateAsync({ id: todo.todo_id });
+      message.success('Task deleted successfully');
+      setIsOpen(false);
+    } catch (error) {
+      console.log(error);
+      message.error('Failed to delete task');
     }
   };
 
   return (
     <>
-      <Button
-        shape="circle"
-        type="default"
-        color='danger'
-        variant='outlined'
-        className='hidden group-hover:block'
-        icon={<Trash size={16} />}
-        onClick={() => setIsOpen(true)}
-      />
+      <Tooltip title='Delete'>
+        <Button
+          type='text'
+          shape='circle'
+          icon={<Trash size={16} color='red' />}
+          onClick={() => setIsOpen(true)}
+        />
+      </Tooltip>
 
       <Modal
         title="Delete Todo"

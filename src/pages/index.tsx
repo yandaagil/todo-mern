@@ -1,52 +1,56 @@
-import UncompletedTodo from "@/components/uncompletedTodo";
+import Todo from "@/components/todo";
 import AddModal from "@/components/addModal";
-import { TodoData } from "@/types/todo.type";
-import CompletedTodo from "@/components/completedTodo";
-import { Button, Divider, Tabs, TabsProps } from "antd";
+import { Divider, Tabs, TabsProps } from "antd";
 import { useTodo } from "@/hooks/useTodo";
 import Header from "@/components/header";
+import Select from "@/components/select";
+import Input, { SearchProps } from "antd/es/input";
+import { useState } from "react";
 
 export default function Home() {
-  const { query: { data, error, isLoading } } = useTodo()
+  const [search, setSearch] = useState<string>("");
+  const { query: { data, error, isLoading } } = useTodo(search)
+  const { todos, uncompletedTodo, completedTodo } = data || { todos: [], uncompletedTodo: [], completedTodo: [] };
 
-  const uncompletedTodo = data?.data.data.filter((todo: TodoData) => !todo.isCompleted) || [];
-  const completedTodo = data?.data.data.filter((todo: TodoData) => todo.isCompleted) || [];
+  const onSearch: SearchProps['onSearch'] = (value: string) => setSearch(value);
 
   const tabItems: TabsProps['items'] = [
     {
       key: '1',
       label: 'All',
       children: <>
-        <UncompletedTodo uncompletedTodo={uncompletedTodo} />
+        <Todo todo={uncompletedTodo} />
         <Divider />
-        <CompletedTodo completedTodo={completedTodo} />
+        <Todo todo={completedTodo} />
       </>,
     },
     {
       key: '2',
-      label: 'Uncompleted',
-      children: <UncompletedTodo uncompletedTodo={uncompletedTodo} />,
+      label: 'Pending',
+      children: <Todo todo={uncompletedTodo} />,
     },
     {
       key: '3',
-      label: 'Completed',
-      children: <CompletedTodo completedTodo={completedTodo} />,
+      label: 'Done',
+      children: <Todo todo={completedTodo} />,
     },
   ];
 
   return (
-    <div className="container mx-auto space-y-5 md:max-w-2xl">
+    <div className="container mx-auto py-5 px-5 md:py-16 space-y-5 md:max-w-2xl">
       <Header />
       <Divider />
       <main>
         <section className="space-y-5">
           <div className="flex justify-between">
             <AddModal />
-            <div className="space-x-3">
-              <Button type="text">Select</Button>
-              <Button>Filter</Button>
-            </div>
+            <Select todos={todos} />
           </div>
+          <Input.Search
+            placeholder="Search todo"
+            onSearch={onSearch}
+            allowClear
+          />
           <div className="space-y-3">
             {isLoading ? (
               <div className="flex items-center justify-center">
