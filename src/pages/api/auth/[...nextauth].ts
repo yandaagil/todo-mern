@@ -31,8 +31,8 @@ export const authOptions: NextAuthOptions = {
     updateAge: 24 * 60 * 60, // 24 hours
   },
   callbacks: {
-    async redirect({ baseUrl }) {
-      return baseUrl;
+    redirect({ url, baseUrl }) {
+      return url.startsWith(baseUrl) ? url : baseUrl;
     },
     async jwt({ token, user }) {
       if (user) {

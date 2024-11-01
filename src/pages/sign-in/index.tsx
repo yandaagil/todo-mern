@@ -14,7 +14,7 @@ const SignIn: FC = () => (
         <Button
           type='primary'
           className='w-full'
-          onClick={() => signIn('google')}
+          onClick={() => signIn('google', { callbackUrl: '/' })}
           icon={<GoogleOutlined />}
         >
           Sign In
