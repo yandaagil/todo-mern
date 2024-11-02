@@ -11,7 +11,7 @@ export const useTodo = (search: string = "") => {
     refetchOnWindowFocus: false,
     staleTime: 1000 * 60 * 5, // 5 minutes
     select: (data) => {
-      const todos: TodoData[] = data?.data.data || [];
+      const todos: TodoData[] = data.data.data || [];
       const uncompletedTodo = todos.filter((todo) => !todo.isCompleted);
       const completedTodo = todos.filter((todo) => todo.isCompleted);
 

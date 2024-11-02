@@ -1,8 +1,8 @@
-import { TodoData, UpdateTodo } from "@/types/todo.type";
+import { CreateTodo, UpdateTodo } from "@/types/todo.type";
 import instance from "../lib/axios/instance";
 
 const todoServices = {
-  addTodo: (todo: TodoData) => instance.post("/todo", todo),
+  addTodo: (todo: CreateTodo) => instance.post("/todo", todo),
   fetchTodos: (search?: string) =>
     instance.get("/todo", { params: { search } }),
   updateTodo: (id: string, todo: UpdateTodo) =>

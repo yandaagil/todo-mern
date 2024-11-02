@@ -2,12 +2,11 @@ import Todo from "@/components/todo";
 import AddModal from "@/components/addModal";
 import { Divider, Tabs, TabsProps } from "antd";
 import { useTodo } from "@/hooks/useTodo";
-import Header from "@/components/header";
 import Select from "@/components/select";
 import Input, { SearchProps } from "antd/es/input";
 import { useState } from "react";
 
-export default function Home() {
+const Home = () => {
   const [search, setSearch] = useState<string>("");
   const { query: { data, error, isLoading } } = useTodo(search)
   const { todos, uncompletedTodo, completedTodo } = data || { todos: [], uncompletedTodo: [], completedTodo: [] };
@@ -37,35 +36,31 @@ export default function Home() {
   ];
 
   return (
-    <div className="container mx-auto py-5 px-5 md:py-16 space-y-5 md:max-w-2xl">
-      <Header />
-      <Divider />
-      <main>
-        <section className="space-y-5">
-          <div className="flex justify-between">
-            <AddModal />
-            <Select todos={todos} />
+    <section className="space-y-5">
+      <div className="flex justify-between">
+        <AddModal />
+        <Select todos={todos} />
+      </div>
+      <Input.Search
+        placeholder="Search todo"
+        onSearch={onSearch}
+        allowClear
+      />
+      <div className="space-y-3">
+        {isLoading ? (
+          <div className="flex items-center justify-center">
+            <p className="text-gray-500">Loading...</p>
           </div>
-          <Input.Search
-            placeholder="Search todo"
-            onSearch={onSearch}
-            allowClear
-          />
-          <div className="space-y-3">
-            {isLoading ? (
-              <div className="flex items-center justify-center">
-                <p className="text-gray-500">Loading...</p>
-              </div>
-            ) : error ? (
-              <div className="flex items-center justify-center">
-                <p className="text-gray-500">Error: {error.message}</p>
-              </div>
-            ) : (
-              <Tabs defaultActiveKey="1" items={tabItems} />
-            )}
+        ) : error ? (
+          <div className="flex items-center justify-center">
+            <p className="text-gray-500">Error: {error.message}</p>
           </div>
-        </section>
-      </main>
-    </div>
+        ) : (
+          <Tabs defaultActiveKey="1" items={tabItems} />
+        )}
+      </div>
+    </section>
   );
 }
+
+export default Home
