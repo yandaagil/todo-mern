@@ -40,7 +40,7 @@ const Select: FC<SelectProps> = ({ todos }) => {
             onClick={() => handleSelectAll(todos)}
             disabled={isPending}
           >
-            {selectedTodos.length === todos.length ? 'Deselect All' : 'Select All'}
+            {selectedTodos.length === todos.length ? `Deselect All (${todos.length})` : `Select All (${todos.length})`}
           </Button>
           <Button
             onClick={handleResetSelect}
@@ -50,8 +50,8 @@ const Select: FC<SelectProps> = ({ todos }) => {
           </Button>
           <Popconfirm
             placement='topRight'
-            title="Delete selected todos"
-            description="Are you sure you want to delete the selected todos?"
+            title={`Delete ${selectedTodos.length > 1 ? `${selectedTodos.length} todos` : `${selectedTodos.length} todo`}`}
+            description={`Are you sure you want to delete ${selectedTodos.length > 1 ? `${selectedTodos.length} todos` : `${selectedTodos.length} todo`}?`}
             open={open}
             onConfirm={handleDelete}
             okButtonProps={{ loading: isPending }}
@@ -64,7 +64,7 @@ const Select: FC<SelectProps> = ({ todos }) => {
               disabled={selectedTodos.length === 0}
               onClick={() => setOpen(true)}
             >
-              Delete
+              {`Delete ${selectedTodos.length > 0 ? `(${selectedTodos.length})` : ''}`}
             </Button>
           </Popconfirm>
         </>

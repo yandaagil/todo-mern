@@ -3,7 +3,6 @@ import type { AppProps } from "next/app";
 import { Inter } from 'next/font/google'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { SessionProvider } from "next-auth/react"
-import Layout from "@/layouts/main.layout";
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -18,9 +17,7 @@ export default function App({ Component, pageProps: { session, ...pageProps } }:
             font-family: ${inter.style.fontFamily}
           }
         `}</style>
-        <Layout>
-          <Component {...pageProps} />
-        </Layout>
+        <Component {...pageProps} />
       </QueryClientProvider>
     </SessionProvider>
   )
