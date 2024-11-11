@@ -111,6 +111,7 @@ const AddModal: FC = () => {
             <DatePicker
               id="date"
               className="w-full"
+              format={"DD-MM-YYYY"}
               onChange={handleDateChange}
               disabled={isPending}
               required

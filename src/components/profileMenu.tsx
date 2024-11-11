@@ -11,9 +11,7 @@ const items: MenuProps['items'] = [
   },
 ];
 
-const onClick: MenuProps['onClick'] = () => {
-  signOut()
-};
+const onClick: MenuProps['onClick'] = () => signOut()
 
 const ProfileMenu = () => {
   const { data: session } = useSession()

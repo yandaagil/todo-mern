@@ -6,11 +6,11 @@ import Head from 'next/head';
 const SignIn = () => (
   <>
     <Head>
-      <title>Todo</title>
+      <title>Sign-In | Todo</title>
     </Head>
     <div className="container mx-auto py-5 px-5 md:py-16 space-y-5 md:max-w-2xl">
       <header>
-        <h2 className="text-2xl font-bold">Sign In Todo</h2>
+        <h2 className="text-2xl font-bold">To-Do</h2>
       </header>
       <Divider />
       <main>

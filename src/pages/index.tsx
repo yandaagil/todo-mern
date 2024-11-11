@@ -1,6 +1,6 @@
 import Todo from "@/components/todo";
 import AddModal from "@/components/addModal";
-import { Divider, Tabs, TabsProps } from "antd";
+import { Divider, Spin, Tabs, TabsProps } from "antd";
 import { useTodo } from "@/hooks/useTodo";
 import Select from "@/components/select";
 import Input, { SearchProps } from "antd/es/input";
@@ -63,8 +63,8 @@ const Home = () => {
             />
             <div className="space-y-3">
               {isLoading ? (
-                <div className="flex items-center justify-center">
-                  <p className="text-gray-500">Loading...</p>
+                <div className="flex items-center justify-center mt-10">
+                  <Spin />
                 </div>
               ) : error ? (
                 <div className="flex items-center justify-center">

@@ -1,4 +1,4 @@
-import { useSelect } from '@/stores/select.store';
+import { useSelectStore } from '@/stores/select.store';
 import { useTodo } from '@/hooks/useTodo';
 import { TodoData } from '@/types/todo.type';
 import { Button, Popconfirm, message } from 'antd';
@@ -15,7 +15,7 @@ const Select: FC<SelectProps> = ({ todos }) => {
     selectedTodos,
     handleSelectAll,
     handleResetSelect,
-  } = useSelect();
+  } = useSelectStore();
   const { deleteMutation: { mutateAsync, isPending } } = useTodo();
   const [open, setOpen] = useState<boolean>(false);
 

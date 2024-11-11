@@ -5,7 +5,7 @@ import { Card, message } from 'antd'
 import { Calendar, Check } from 'lucide-react'
 import { date } from '@/utils/date'
 import TodoAction from './todoAction'
-import { useSelect } from '@/stores/select.store'
+import { useSelectStore } from '@/stores/select.store'
 import { cn } from '@/lib/utils'
 import { dueDate } from '@/helpers/todoDate'
 
@@ -15,7 +15,7 @@ type TodoProps = {
 
 const Todo: FC<TodoProps> = ({ todo }) => {
   const { updateMutation: { mutateAsync } } = useTodo()
-  const { selectMode, handleSelectTodo, selectedTodos } = useSelect();
+  const { selectMode, handleSelectTodo, selectedTodos } = useSelectStore();
 
   const handleUpdate = async (id: string, isCompleted: boolean) => {
     try {
@@ -61,12 +61,17 @@ const Todo: FC<TodoProps> = ({ todo }) => {
                   )}>{todo.todo}</p>
                   <p className={cn('text-xs font-semibold flex gap-2 items-center text-gray-600',
                     {
-                      'text-yellow-600': !todo.isCompleted && dueDate(todo.date) === 0,
+                      'text-yellow-600': !todo.isCompleted && dueDate(todo.date) === 1,
+                      'text-green-600': !todo.isCompleted && dueDate(todo.date) === 0,
                       'text-red-600': !todo.isCompleted && (dueDate(todo.date) === -1 || dueDate(todo.date) < -1)
                     }
                   )}>
                     <Calendar size={15} />
-                    {date(todo.date)}
+                    {dueDate(todo.date) === 1 ? 'Tomorrow'
+                      : dueDate(todo.date) === 0 ? 'Today'
+                        : (dueDate(todo.date) === -1 || dueDate(todo.date) < -1) ? 'Overdue'
+                          : date(todo.date)
+                    }
                   </p>
                 </div>
               </div>

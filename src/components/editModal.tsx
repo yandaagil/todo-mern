@@ -127,6 +127,7 @@ const EditModal: FC<EditModalProps> = ({ todo }) => {
               id="date"
               value={form.date ? dayjs(form.date) : null}
               className="w-full"
+              format={"DD-MM-YYYY"}
               onChange={handleDateChange}
               disabled={isPending}
               required
